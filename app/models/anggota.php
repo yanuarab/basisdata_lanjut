@@ -1,6 +1,6 @@
 <?php
 
-class Buku {
+class Anggota {
 
     private $db;
 
@@ -9,36 +9,35 @@ class Buku {
     }
 
     public function getAll() {
-        $sql = "SELECT * FROM buku ORDER BY id_buku ASC";
+        $sql = "SELECT * FROM anggota ORDER BY id_anggota ASC";
         return $this->db->query($sql)->fetchAll();
     }
 
     public function getById($id) {
-        $stmt = $this->db->prepare("SELECT * FROM buku WHERE id_buku = :id");
+        $stmt = $this->db->prepare("SELECT * FROM anggota WHERE id_anggota = :id");
         $stmt->execute(['id' => $id]);
         return $stmt->fetch();
     }
 
     public function create($data) {
-        $sql = "INSERT INTO buku (judul, pengarang, tahun_terbit, stok)
-                VALUES (:judul, :pengarang, :tahun_terbit, :stok)";
+        $sql = "INSERT INTO anggota (nama, alamat, telepon)
+                VALUES (:nama, :alamat, :telepon)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
     }
 
     public function update($data) {
-        $sql = "UPDATE buku SET
-                judul = :judul,
-                pengarang = :pengarang,
-                tahun_terbit = :tahun_terbit,
-                stok = :stok
-                WHERE id_buku = :id_buku";
+        $sql = "UPDATE anggota SET
+                    nama = :nama,
+                    alamat = :alamat,
+                    telepon = :telepon
+                WHERE id_anggota = :id_anggota";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
     }
 
     public function delete($id) {
-        $stmt = $this->db->prepare("DELETE FROM buku WHERE id_buku = :id");
+        $stmt = $this->db->prepare("DELETE FROM anggota WHERE id_anggota = :id");
         return $stmt->execute(['id' => $id]);
     }
 }

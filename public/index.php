@@ -19,6 +19,7 @@ require_once __DIR__ . '/../app/config/database.php';
 require_once __DIR__ . '/../app/controllers/AuthController.php';
 require_once __DIR__ . '/../app/controllers/DashboardController.php';
 require_once __DIR__ . '/../app/controllers/BukuController.php';
+require_once __DIR__ . '/../app/controllers/AnggotaController.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,7 @@ $pdo = $db->getConnection();
 $auth = new AuthController($pdo);
 $dashboard = new DashboardController();
 $buku = new BukuController($pdo);
+$anggota = new AnggotaController($pdo);
 
 /*
 |--------------------------------------------------------------------------
@@ -90,6 +92,43 @@ if (preg_match('/^buku\/delete\/(\d+)$/', $uri, $m)) {
     $buku->delete($m[1]);
     exit;
 }
+
+/*
+|--------------------------------------------------------------------------
+| ANGGOTA MODULE
+|--------------------------------------------------------------------------
+*/
+
+if ($uri === 'anggota') { 
+    $anggota->index(); 
+    exit;
+}
+
+if ($uri === 'anggota/create') { 
+    $anggota->create(); 
+    exit; 
+}
+
+if ($uri === 'anggota/store') { 
+    $anggota->store(); 
+    exit; 
+}
+
+if (preg_match('/^anggota\/edit\/(\d+)$/', $uri, $m)) {
+    $anggota->edit($m[1]);
+    exit;
+}
+
+if ($uri === 'anggota/update') { 
+    $anggota->update(); 
+    exit; 
+}
+
+if (preg_match('/^anggota\/delete\/(\d+)$/', $uri, $m)) {
+    $anggota->delete($m[1]);
+    exit;
+}
+
 
 /*
 |--------------------------------------------------------------------------
