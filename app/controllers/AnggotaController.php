@@ -38,10 +38,10 @@ class AnggotaController {
 
     public function update() {
         $data = [
-            'nama'      => $_POST['nama'],
-            'alamat'    => $_POST['alamat'],
-            'telepon'   => $_POST['telepon'],
-            'id_anggota'=> $_POST['id_anggota']
+            'nama'       => $_POST['nama'],
+            'alamat'     => $_POST['alamat'],
+            'no_hp'      => $_POST['no_hp'],
+            'id_anggota' => $_POST['id_anggota']
         ];
 
         $this->anggota->update($data);

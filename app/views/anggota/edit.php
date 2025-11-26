@@ -14,8 +14,8 @@
         <label>Alamat</label>
         <input type="text" name="alamat" value="<?= $anggota['alamat']; ?>" required><br><br>
 
-        <label>Telepon</label>
-        <input type="text" name="telepon" value="<?= $anggota['telepon']; ?>" required><br><br>
+        <label>No HP</label>
+        <input type="text" name="no_hp" value="<?= $anggota['no_hp']; ?>" required>
 
         <button type="submit">Update</button>
         <a href="<?= BASE_URL ?>anggota">Kembali</a>

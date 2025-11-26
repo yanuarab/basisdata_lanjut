@@ -20,8 +20,8 @@ class Anggota {
     }
 
     public function create($data) {
-        $sql = "INSERT INTO anggota (nama, alamat, telepon)
-                VALUES (:nama, :alamat, :telepon)";
+        $sql = "INSERT INTO anggota (nama, alamat, no_hp)
+        VALUES (:nama, :alamat, :no_hp)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
     }

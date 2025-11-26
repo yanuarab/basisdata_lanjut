@@ -77,7 +77,6 @@ if (preg_match('/^buku\/delete\/(\d+)$/', $uri, $m)) {
     exit;
 }
 
-<<<<<<< HEAD
 /*
 |--------------------------------------------------------------------------
 | ANGGOTA MODULE
@@ -120,7 +119,6 @@ if (preg_match('/^anggota\/delete\/(\d+)$/', $uri, $m)) {
 | 404
 |--------------------------------------------------------------------------
 */
-=======
 //peminjaman
 if ($uri === 'peminjaman') { $peminjaman->index(); exit; }
 if ($uri === 'peminjaman/create') { $peminjaman->create(); exit; }
@@ -139,6 +137,5 @@ if (preg_match('/^peminjaman\/delete\/(\d+)$/', $uri, $m)) {
 }
 
 /* DEFAULT 404 */
->>>>>>> 2f0e1e2d9c689e3fcbdf4c539b625da1a33b25c3
 http_response_code(404);
 echo "404 Not Found";
