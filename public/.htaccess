@@ -1,0 +1,13 @@
+Options -Indexes
+
+RewriteEngine On
+
+# Folder public sebagai root
+RewriteBase /basisdata_lanjut/public/
+
+# Jika file atau folder memang ada, biarkan
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Semua request masuk ke index.php
+RewriteRule ^ index.php [L]

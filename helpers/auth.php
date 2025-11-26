@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/config.php';
 
 function isLogin() {
     return isset($_SESSION['admin']);
@@ -7,7 +7,7 @@ function isLogin() {
 
 function mustLogin() {
     if (!isLogin()) {
-        header("Location: ../../public/index.php");
-        exit();
+        header("Location: " . BASE_URL . "login.php");
+        exit;
     }
 }
