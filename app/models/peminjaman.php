@@ -26,7 +26,7 @@ class Peminjaman
             FROM peminjaman p
             LEFT JOIN anggota a ON p.id_anggota = a.id_anggota
             LEFT JOIN buku b ON p.id_buku = b.id_buku
-            ORDER BY p.id_peminjaman DESC
+            ORDER BY p.id_peminjaman ASC
         ";
         $stmt = $this->pdo->query($sql);
         return $stmt->fetchAll();
