@@ -1,12 +1,12 @@
-<?php
-require_once __DIR__ . '/../../config/config.php';
-require_once __DIR__ . '/../../helpers/auth.php';
+<?php include __DIR__ . '/../template/header.php'; ?>
+<?php include __DIR__ . '/../template/sidebar.php'; ?>
 
-mustLogin();
-?>
+<div class="content">
+    <h1>Dashboard</h1>
+    <p>Selamat datang, <?= $_SESSION['admin']['username']; ?>!</p>
+</div>
 
-<?php include __DIR__ . "/../template/header.php"; ?>
-<?php include __DIR__ . "/../template/sidebar.php"; ?>
+<?php include __DIR__ . '/../template/footer.php'; ?>
 
 <div class="content">
     <h1 class="title">Selamat datang, <?= $_SESSION['admin']['username']; ?> 👋</h1>

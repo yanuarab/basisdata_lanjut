@@ -1,8 +1,12 @@
 <?php
 class Database {
-    private $pdo = null;
+    public $pdo = null;
 
-    public function connect() {
+    public function __construct() {
+        $this->connect();
+    }
+
+    private function connect() {
         if ($this->pdo !== null) return $this->pdo;
 
         $DB_HOST = 'localhost';
@@ -12,15 +16,20 @@ class Database {
         $DB_PASS = '12345678';
 
         try {
-            $dsn = "pgsql:host=$DB_HOST;port=$DB_PORT;dbname=$DB_NAME;";
+            $dsn = "pgsql:host={$DB_HOST};port={$DB_PORT};dbname={$DB_NAME};";
             $this->pdo = new PDO($dsn, $DB_USER, $DB_PASS, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
             ]);
-            return $this->pdo;
+
         } catch (PDOException $e) {
-            // jangan expose password di production
-            die("DB connection failed: " . $e->getMessage());
+            die("Database Connection Failed: " . $e->getMessage());
         }
+
+        return $this->pdo;
+    }
+
+    public function getConnection() {
+        return $this->pdo;
     }
 }
