@@ -84,12 +84,18 @@
     text-decoration: none;
     font-size: 16px;
     color: #222;
-    transition: 0.3s;
+    border-radius: 10px;
+    transition:
+        background 0.25s cubic-bezier(0.4, 0.0, 0.2, 1),
+        color 0.25s cubic-bezier(0.4, 0.0, 0.2, 1),
+        padding 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .menu a:hover {
-    background: rgba(0,0,0,0.08);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+    color: #000;
+    transform: translateX(4px);
 }
 
 .sidebar.collapsed .menu a span {
@@ -100,6 +106,69 @@
     justify-content: center;
     padding: 12px 0;
 }
+
+.menu a {
+    display: flex;
+    align-items: center;     /* sejajarkan icon & teks secara vertikal */
+    gap: 15px;
+    padding: 12px 20px;
+    text-decoration: none;
+    font-size: 16px;
+    color: #222;
+    transition: 0.3s;
+
+    line-height: 1.3;        /* distabilkan */
+}
+
+/* Uniform icon: tidak miring lagi */
+.menu a i {
+    width: 22px;
+    text-align: center;
+    font-size: 18px;
+    transition: 0.25s ease;
+}
+
+/* Hover styling */
+.menu a:hover {
+    background: rgba(0,0,0,0.08);
+    border-radius: 8px;
+}
+
+.menu a:hover i {
+    transform: scale(1.15);
+}
+
+/* ============ ACTIVE MENU ============ */
+.menu a.active {
+    background: linear-gradient(135deg, #d08b6e, #92bfba);
+    color: white;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.2);
+    transform: translateX(6px);
+}
+
+.menu a.active i {
+    color: white;
+}
+
+/* Collapse mode */
+.sidebar.collapsed .menu a span {
+    display: none;
+}
+
+.sidebar.collapsed .menu a {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.sidebar.collapsed .menu a.active {
+    border-radius: 12px;
+    transform: none;
+}
+
+.menu li {
+    display: block;
+}
+
 </style>
 
 <aside class="sidebar" id="sidebar">
@@ -118,6 +187,13 @@
             <a href="<?= BASE_URL ?>dashboard">
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="<?= BASE_URL ?>kategori">
+                <i class="fas fa-tags"></i>
+                <span>Kategori Buku</span>
             </a>
         </li>
 
@@ -161,6 +237,13 @@
 </aside>
 
 <script>
+const current = window.location.href;
+document.querySelectorAll(".menu a").forEach(a => {
+    if (a.href === current) {
+        a.classList.add("active");
+    }
+});
+
 document.getElementById("toggleSidebar").onclick = function() {
     document.getElementById("sidebar").classList.toggle("collapsed");
 };

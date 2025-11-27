@@ -2,16 +2,9 @@
 <?php include __DIR__ . '/../template/sidebar.php'; ?>
 
 <div class="content">
-    <h1>Dashboard</h1>
-    <p>Selamat datang, <?= $_SESSION['admin']['username']; ?>!</p>
-</div>
-
-<?php include __DIR__ . '/../template/footer.php'; ?>
-
-<div class="content">
-    <h1 class="title">Selamat datang, <?= $_SESSION['admin']['username']; ?> 👋</h1>
-    <p class="subtitle">Anda berada di Dashboard Sistem Perpustakaan.</p>
-
+    <h1>Hi, Admin👋</h1>
+    <p>Selamat Datang Di Halaman <b>Dashboard</b></p>
+    
     <div class="cards">
         <div class="card">
             <h3>Total Buku</h3>
@@ -27,7 +20,7 @@
         </div>
     </div>
 
-    <a href="<?= BASE_URL ?>logout" class="logout-btn">Logout</a>
+    
 </div>
 
 <?php include __DIR__ . "/../template/footer.php"; ?>

@@ -8,9 +8,35 @@ class Anggota {
         $this->db = $pdo;
     }
 
-    public function getAll() {
-        $sql = "SELECT * FROM anggota ORDER BY id_anggota ASC";
-        return $this->db->query($sql)->fetchAll();
+    // Pagination + Search
+    public function getPagination($limit, $offset, $keyword = '') {
+        $keyword = "%$keyword%";
+
+        $sql = "SELECT * FROM anggota 
+                WHERE nama ILIKE :keyword OR alamat ILIKE :keyword
+                ORDER BY id_anggota ASC
+                LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':keyword', $keyword);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    public function countData($keyword = '') {
+        $keyword = "%$keyword%";
+
+        $sql = "SELECT COUNT(*) AS total FROM anggota 
+                WHERE nama ILIKE :keyword OR alamat ILIKE :keyword";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':keyword', $keyword);
+        $stmt->execute();
+
+        return $stmt->fetch()['total'];
     }
 
     public function getById($id) {
@@ -21,7 +47,7 @@ class Anggota {
 
     public function create($data) {
         $sql = "INSERT INTO anggota (nama, alamat, no_hp)
-        VALUES (:nama, :alamat, :no_hp)";
+                VALUES (:nama, :alamat, :no_hp)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
     }
@@ -30,8 +56,9 @@ class Anggota {
         $sql = "UPDATE anggota SET
                     nama = :nama,
                     alamat = :alamat,
-                    telepon = :telepon
+                    no_hp = :no_hp
                 WHERE id_anggota = :id_anggota";
+
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
     }

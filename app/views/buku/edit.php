@@ -17,6 +17,28 @@
         <label>Tahun Terbit</label>
         <input type="number" name="tahun_terbit" value="<?= $buku['tahun_terbit']; ?>" required><br><br>
 
+        <label>Kategori</label>
+        <select name="id_kategori" required>
+            <?php foreach ($kategori as $k): ?>
+                <option value="<?= $k['id_kategori'] ?>"
+                    <?= ($buku['id_kategori'] == $k['id_kategori']) ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($k['nama_kategori']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <br><br>
+
+        <label>Penerbit</label>
+        <select name="id_penerbit" required>
+            <?php foreach ($penerbit as $p): ?>
+                <option value="<?= $p['id_penerbit'] ?>"
+                    <?= ($buku['id_penerbit'] == $p['id_penerbit']) ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($p['nama_penerbit']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <br><br>
+
         <label>Stok</label>
         <input type="number" name="stok" value="<?= $buku['stok']; ?>" required><br><br>
 

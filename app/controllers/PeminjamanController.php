@@ -4,18 +4,25 @@ require_once __DIR__ . '/../models/Peminjaman.php';
 class PeminjamanController
 {
     private $model;
-    private $pdo;
 
     public function __construct($pdo)
     {
-        $this->pdo = $pdo;
         $this->model = new Peminjaman($pdo);
     }
 
     public function index()
     {
-        $data = $this->model->all();
-        // view akan menerima $data
+        $keyword = $_GET['search'] ?? '';
+
+        $limit = 10;
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $offset = ($page - 1) * $limit;
+
+        $totalData = $this->model->countData($keyword);
+        $totalPage = ceil($totalData / $limit);
+
+        $data = $this->model->getPagination($limit, $offset, $keyword);
+
         require_once __DIR__ . '/../views/peminjaman/index.php';
     }
 
@@ -23,21 +30,20 @@ class PeminjamanController
     {
         $anggota = $this->model->anggotaList();
         $buku = $this->model->bukuList();
+
         require_once __DIR__ . '/../views/peminjaman/create.php';
     }
 
     public function store()
     {
-        // sanitasi minimal, kamu bisa tambah validasi
-        $payload = [
-            'id_anggota' => $_POST['id_anggota'] ?? null,
-            'id_buku' => $_POST['id_buku'] ?? null,
-            'tanggal_pinjam' => $_POST['tanggal_pinjam'] ?? date('Y-m-d'),
+        $this->model->store([
+            'id_anggota' => $_POST['id_anggota'],
+            'id_buku' => $_POST['id_buku'],
+            'tanggal_pinjam' => $_POST['tanggal_pinjam'],
             'tanggal_kembali' => $_POST['tanggal_kembali'] ?: null,
-            'status' => $_POST['status'] ?? 'Dipinjam'
-        ];
+            'status' => $_POST['status']
+        ]);
 
-        $this->model->store($payload);
         header("Location: " . BASE_URL . "peminjaman");
         exit;
     }
@@ -47,21 +53,21 @@ class PeminjamanController
         $data = $this->model->find($id);
         $anggota = $this->model->anggotaList();
         $buku = $this->model->bukuList();
+
         require_once __DIR__ . '/../views/peminjaman/edit.php';
     }
 
     public function update()
     {
-        $payload = [
+        $this->model->update([
             'id_peminjaman' => $_POST['id_peminjaman'],
-            'id_anggota' => $_POST['id_anggota'] ?? null,
-            'id_buku' => $_POST['id_buku'] ?? null,
-            'tanggal_pinjam' => $_POST['tanggal_pinjam'] ?? date('Y-m-d'),
+            'id_anggota' => $_POST['id_anggota'],
+            'id_buku' => $_POST['id_buku'],
+            'tanggal_pinjam' => $_POST['tanggal_pinjam'],
             'tanggal_kembali' => $_POST['tanggal_kembali'] ?: null,
-            'status' => $_POST['status'] ?? 'Dipinjam'
-        ];
+            'status' => $_POST['status']
+        ]);
 
-        $this->model->update($payload);
         header("Location: " . BASE_URL . "peminjaman");
         exit;
     }

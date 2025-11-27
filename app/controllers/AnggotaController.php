@@ -11,7 +11,17 @@ class AnggotaController {
     }
 
     public function index() {
-        $data = $this->anggota->getAll();
+
+        $keyword = $_GET['search'] ?? '';
+        $limit = 10;
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $offset = ($page - 1) * $limit;
+
+        $totalData = $this->anggota->countData($keyword);
+        $totalPage = ceil($totalData / $limit);
+
+        $data = $this->anggota->getPagination($limit, $offset, $keyword);
+
         require_once __DIR__ . '/../views/anggota/index.php';
     }
 
@@ -21,9 +31,9 @@ class AnggotaController {
 
     public function store() {
         $data = [
-            'nama'      => $_POST['nama'],
-            'alamat'    => $_POST['alamat'],
-            'telepon'   => $_POST['telepon']
+            'nama'   => $_POST['nama'],
+            'alamat' => $_POST['alamat'],
+            'no_hp'  => $_POST['no_hp']
         ];
 
         $this->anggota->create($data);
@@ -45,7 +55,6 @@ class AnggotaController {
         ];
 
         $this->anggota->update($data);
-
         header("Location: " . BASE_URL . "anggota");
         exit;
     }
@@ -56,3 +65,4 @@ class AnggotaController {
         exit;
     }
 }
+
