@@ -226,6 +226,13 @@
         </li>
 
         <li>
+            <a href="<?= BASE_URL ?>buku_populer">
+                <i class="fas fa-file"></i>
+                <span>Buku Populer</span>
+            </a>
+        </li>
+
+        <li>
             <a href="<?= BASE_URL ?>logout">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>

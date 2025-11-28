@@ -12,6 +12,7 @@ require_once __DIR__ . '/../app/controllers/BukuController.php';
 require_once __DIR__ . '/../app/controllers/AnggotaController.php';
 require_once __DIR__ . '/../app/controllers/PeminjamanController.php';
 require_once __DIR__ . '/../app/controllers/LaporanController.php';
+require_once __DIR__ . '/../app/controllers/BukuPopulerController.php';
 require_once __DIR__ . '/../app/controllers/KategoriController.php';
 
 $db = new Database();
@@ -23,6 +24,7 @@ $buku       = new BukuController($pdo);
 $anggota    = new AnggotaController($pdo);
 $peminjaman = new PeminjamanController($pdo);
 $laporan = new LaporanController($pdo);
+$bukuPopuler = new BukuPopulerController($pdo);
 
 /* ==========================================
    (B) TAMBAHKAN OBJECT KATEGORI
@@ -93,7 +95,7 @@ if (preg_match('/^anggota\/delete\/(\d+)$/', $uri, $m)) {
 }
 
 /* ===============================
-   KATEGORI  (FIXED)
+   KATEGORI  
 ================================*/
 if ($uri === 'kategori') { $kategori->index(); exit; }
 if ($uri === 'kategori/create') { $kategori->create(); exit; }
@@ -137,6 +139,19 @@ if (preg_match('/^peminjaman\/delete\/(\d+)$/', $uri, $m)) {
 if ($uri === 'laporan') { 
     $laporan->index();
     exit;
+}
+
+/* ===========================
+   BUKU POPULER
+=========================== */
+if ($uri === 'buku_populer') { 
+    $bukuPopuler->index();
+    exit;
+}
+
+if ($uri === 'buku-populer/refresh') { 
+    $bukuPopuler->refresh(); 
+    exit; 
 }
 
 /* DEFAULT 404 */
