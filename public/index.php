@@ -10,30 +10,24 @@ require_once __DIR__ . '/../app/controllers/AuthController.php';
 require_once __DIR__ . '/../app/controllers/DashboardController.php';
 require_once __DIR__ . '/../app/controllers/BukuController.php';
 require_once __DIR__ . '/../app/controllers/AnggotaController.php';
-
-/* 
-==========================================
-(A) TAMBAHKAN FILE CONTROLLER PEMINJAMAN
-==========================================
-*/
 require_once __DIR__ . '/../app/controllers/PeminjamanController.php';
-
+require_once __DIR__ . '/../app/controllers/LaporanController.php';
+require_once __DIR__ . '/../app/controllers/KategoriController.php';
 
 $db = new Database();
 $pdo = $db->getConnection();
 
-$auth = new AuthController($pdo);
-$dashboard = new DashboardController();
-$buku = new BukuController($pdo);
-$anggota = new AnggotaController($pdo);
-
-/* 
-==========================================
-(B) TAMBAHKAN OBJECT PEMINJAMAN
-==========================================
-*/
+$auth       = new AuthController($pdo);
+$dashboard  = new DashboardController();
+$buku       = new BukuController($pdo);
+$anggota    = new AnggotaController($pdo);
 $peminjaman = new PeminjamanController($pdo);
+$laporan = new LaporanController($pdo);
 
+/* ==========================================
+   (B) TAMBAHKAN OBJECT KATEGORI
+=========================================== */
+$kategori   = new KategoriController($pdo);
 
 $uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 $uri = str_replace('basisdata_lanjut/public/', '', $uri);
@@ -60,7 +54,9 @@ if ($uri === 'dashboard') {
     exit;
 }
 
-/* BUKU */
+/* ===============================
+   BUKU
+================================*/
 if ($uri === 'buku') { $buku->index(); exit; }
 if ($uri === 'buku/create') { $buku->create(); exit; }
 if ($uri === 'buku/store') { $buku->store(); exit; }
@@ -77,49 +73,47 @@ if (preg_match('/^buku\/delete\/(\d+)$/', $uri, $m)) {
     exit;
 }
 
-/*
-|--------------------------------------------------------------------------
-| ANGGOTA MODULE
-|--------------------------------------------------------------------------
-*/
-
-if ($uri === 'anggota') { 
-    $anggota->index(); 
-    exit;
-}
-
-if ($uri === 'anggota/create') { 
-    $anggota->create(); 
-    exit; 
-}
-
-if ($uri === 'anggota/store') { 
-    $anggota->store(); 
-    exit; 
-}
+/* ===============================
+   ANGGOTA
+================================*/
+if ($uri === 'anggota') { $anggota->index(); exit; }
+if ($uri === 'anggota/create') { $anggota->create(); exit; }
+if ($uri === 'anggota/store') { $anggota->store(); exit; }
 
 if (preg_match('/^anggota\/edit\/(\d+)$/', $uri, $m)) {
     $anggota->edit($m[1]);
     exit;
 }
 
-if ($uri === 'anggota/update') { 
-    $anggota->update(); 
-    exit; 
-}
+if ($uri === 'anggota/update') { $anggota->update(); exit; }
 
 if (preg_match('/^anggota\/delete\/(\d+)$/', $uri, $m)) {
     $anggota->delete($m[1]);
     exit;
 }
 
+/* ===============================
+   KATEGORI  (FIXED)
+================================*/
+if ($uri === 'kategori') { $kategori->index(); exit; }
+if ($uri === 'kategori/create') { $kategori->create(); exit; }
+if ($uri === 'kategori/store') { $kategori->store(); exit; }
 
-/*
-|--------------------------------------------------------------------------
-| 404
-|--------------------------------------------------------------------------
-*/
-//peminjaman
+if (preg_match('/^kategori\/edit\/(\d+)$/', $uri, $m)) {
+    $kategori->edit($m[1]);
+    exit;
+}
+
+if ($uri === 'kategori/update') { $kategori->update(); exit; }
+
+if (preg_match('/^kategori\/delete\/(\d+)$/', $uri, $m)) {
+    $kategori->delete($m[1]);
+    exit;
+}
+
+/* ===============================
+   PEMINJAMAN
+================================*/
 if ($uri === 'peminjaman') { $peminjaman->index(); exit; }
 if ($uri === 'peminjaman/create') { $peminjaman->create(); exit; }
 if ($uri === 'peminjaman/store') { $peminjaman->store(); exit; }
@@ -133,6 +127,15 @@ if ($uri === 'peminjaman/update') { $peminjaman->update(); exit; }
 
 if (preg_match('/^peminjaman\/delete\/(\d+)$/', $uri, $m)) {
     $peminjaman->delete($m[1]);
+    exit;
+}
+
+/* ===========================
+   LAPORAN
+=========================== */
+
+if ($uri === 'laporan') { 
+    $laporan->index();
     exit;
 }
 
