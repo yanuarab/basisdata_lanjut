@@ -22,6 +22,11 @@
 .table tr:hover {
     background: #f2f2f2;
 }
+
+.table td, 
+.table th {
+    text-align: left;
+}
 </style>
 
 <div class="content">

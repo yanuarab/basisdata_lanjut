@@ -23,6 +23,11 @@
     background: #f2f2f2;
 }
 
+.table td, 
+.table th {
+    text-align: center;
+}
+
 .search-box {
     display: flex;
     gap: 10px;

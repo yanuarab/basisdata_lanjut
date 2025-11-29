@@ -227,7 +227,7 @@
 
         <li>
             <a href="<?= BASE_URL ?>buku_populer">
-                <i class="fas fa-file"></i>
+                <i class="fas fa-line-chart"></i>
                 <span>Buku Populer</span>
             </a>
         </li>
@@ -244,9 +244,10 @@
 </aside>
 
 <script>
-const current = window.location.href;
+const path = window.location.pathname;
+
 document.querySelectorAll(".menu a").forEach(a => {
-    if (a.href === current) {
+    if (a.getAttribute("href") === path || a.pathname === path) {
         a.classList.add("active");
     }
 });
@@ -255,3 +256,4 @@ document.getElementById("toggleSidebar").onclick = function() {
     document.getElementById("sidebar").classList.toggle("collapsed");
 };
 </script>
+
