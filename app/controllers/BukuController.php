@@ -1,83 +1,110 @@
 <?php
-
-require_once __DIR__ . '/../models/Buku.php';
+require_once __DIR__ . "/../models/Buku.php";
 
 class BukuController {
-
     private $buku;
 
     public function __construct($pdo) {
         $this->buku = new Buku($pdo);
+        
     }
 
-    public function index() {
+    // ===========================
+    // LIST DATA (INDEX)
+    // ===========================
+public function index() {
+    $limit  = 10;
 
-        $keyword = $_GET['search'] ?? '';
-        $limit = 10;
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $offset = ($page - 1) * $limit;
+    // Ambil parameter GET + trim
+    $page      = intval($_GET['page']      ?? 1);
+    $search    = trim($_GET['search']      ?? '');
+    $kategori  = trim($_GET['kategori']    ?? '');
+    $penerbit  = trim($_GET['penerbit']    ?? '');
+    $tahun     = trim($_GET['tahun']       ?? '');
 
-        $totalData = $this->buku->countData($keyword);
-        $totalPage = ceil($totalData / $limit);
+    // Minimal page = 1
+    if ($page < 1) $page = 1;
 
-        $data = $this->buku->getPagination($limit, $offset, $keyword);
+    $offset = ($page - 1) * $limit;
 
-        require_once __DIR__ . '/../views/buku/index.php';
-    }
+    // Ambil data buku
+    $buku       = $this->buku->getPagination($limit, $offset, $search, $kategori, $penerbit, $tahun);
+    $totalData  = $this->buku->getTotalData($search, $kategori, $penerbit, $tahun);
 
+    // Data dropdown
+    $kategoriList = $this->buku->getKategoriList();
+    $penerbitList = $this->buku->getPenerbitList();
+
+    $totalPage = ceil($totalData / $limit);
+
+    include __DIR__ . '/../views/buku/index.php';
+}
+
+
+
+    // ===========================
+    // FORM TAMBAH
+    // ===========================
     public function create() {
-        // ambil kategori & penerbit
-        $kategori = $this->buku->getAllKategori();
-        $penerbit = $this->buku->getAllPenerbit();
-
-        require_once __DIR__ . '/../views/buku/create.php';
+        include __DIR__ . "/../views/buku/create.php";
     }
 
+    // ===========================
+    // STORE DATA
+    // ===========================
     public function store() {
         $data = [
-            'judul'        => $_POST['judul'],
-            'pengarang'    => $_POST['pengarang'],
-            'tahun_terbit' => $_POST['tahun_terbit'],
-            'id_kategori'  => $_POST['id_kategori'],
-            'id_penerbit'  => $_POST['id_penerbit'],
-            'stok'         => $_POST['stok']
+            'judul'         => $_POST['judul'],
+            'pengarang'     => $_POST['pengarang'],
+            'tahun_terbit'  => $_POST['tahun_terbit'],
+            'id_kategori'   => $_POST['id_kategori'],
+            'id_penerbit'   => $_POST['id_penerbit'],
+            'stok'          => $_POST['stok'],
+            'isbn'          => $_POST['isbn']
         ];
 
         $this->buku->create($data);
-
-        header("Location: " . BASE_URL . "buku");
-        exit;
+        header("Location: index.php?msg=created");
     }
 
-    public function edit($id) {
-        $buku = $this->buku->getById($id);
 
-        $kategori = $this->buku->getAllKategori();
-        $penerbit = $this->buku->getAllPenerbit();
-
-        require_once __DIR__ . '/../views/buku/edit.php';
+    // ===========================
+    // FORM EDIT
+    // ===========================
+    public function edit() {
+        $id = $_GET['id'];
+        $data['buku'] = $this->buku->getById($id);
+        include __DIR__ . "/../views/buku/edit.php";
     }
 
+    // ===========================
+    // UPDATE DATA
+    // ===========================
     public function update() {
+        $id = $_POST['id'];
+
         $data = [
-            'judul'        => $_POST['judul'],
-            'pengarang'    => $_POST['pengarang'],
-            'tahun_terbit' => $_POST['tahun_terbit'],
-            'id_kategori'  => $_POST['id_kategori'],
-            'id_penerbit'  => $_POST['id_penerbit'],
-            'stok'         => $_POST['stok'],
-            'id_buku'      => $_POST['id_buku']
+            'judul'         => $_POST['judul'],
+            'pengarang'     => $_POST['pengarang'],
+            'tahun_terbit'  => $_POST['tahun_terbit'],
+            'id_kategori'   => $_POST['id_kategori'],
+            'id_penerbit'   => $_POST['id_penerbit'],
+            'stok'          => $_POST['stok'],
+            'isbn'          => $_POST['isbn']
         ];
 
-        $this->buku->update($data);
-
-        header("Location: " . BASE_URL . "buku");
-        exit;
+        $this->buku->update($id, $data);
+        header("Location: index.php?msg=updated");
     }
 
-    public function delete($id) {
+
+    // ===========================
+    // HAPUS DATA
+    // ===========================
+    public function delete() {
+        $id = $_GET['id'];
         $this->buku->delete($id);
-        header("Location: " . BASE_URL . "buku");
-        exit;
+        header("Location: index.php?msg=deleted");
     }
 }
+?>

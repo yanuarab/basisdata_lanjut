@@ -3,8 +3,7 @@ class Peminjaman
 {
     private $pdo;
 
-    public function __construct($pdo)
-    {
+    public function __construct($pdo){
         $this->pdo = $pdo;
     }
 

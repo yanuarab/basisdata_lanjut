@@ -1,6 +1,14 @@
 <?php include __DIR__ . '/../template/header.php'; ?>
 <?php include __DIR__ . '/../template/sidebar.php'; ?>
 
+<?php
+$search   = trim($_GET['search']   ?? '');
+$kategori = trim($_GET['kategori'] ?? '');
+$penerbit = trim($_GET['penerbit'] ?? '');
+$tahun    = trim($_GET['tahun']    ?? '');
+
+?>
+
 <style>
 .table {
     width: 100%;
@@ -102,18 +110,7 @@
     transform: translateY(5px);
 }
 
-/* Action buttons */
-.action-btn,
-.action-btn:focus,
-.action-btn:active {
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-.action-group a:focus {
-    outline: none !important;
-}
-
+/* ACTION BUTTON */
 .action-group {
     display: flex;
     gap: 8px;
@@ -151,13 +148,14 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) translateY(12px); 
+    transform: translate(-50%, -50%) translateY(12px);
     font-size: 1px;
     color: white;
     opacity: 0;
     transition: all .25s ease;
 }
 
+/* EDIT */
 .btn-edit::before {
     content: "Edit";
 }
@@ -172,6 +170,7 @@
     transform: translate(-50%, -50%) translateY(-3px);
 }
 
+/* DELETE */
 .btn-delete::before {
     content: "Delete";
 }
@@ -186,11 +185,13 @@
     transform: translate(-50%, -50%) translateY(-3px);
 }
 
+/* Icon slide */
 .action-btn:hover i {
     transform: translateY(80%);
     font-size: 26px;
 }
 </style>
+
 
 <div class="content">
     <h2>Data Buku</h2>
@@ -199,16 +200,43 @@
         <i class="fas fa-plus"></i> Tambah Buku
     </a>
 
-    <!-- Search -->
-    <div class="search-box">
-        <input 
-            type="text" 
-            id="search" 
-            placeholder="Cari judul atau pengarang..."
-            value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
-        >
-        <button id="btnSearch">Cari</button>
-    </div>
+    <!-- FILTER -->
+    <form method="GET" style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
+        <input type="text" name="search" placeholder="Cari judul atau pengarang..."
+               value="<?= htmlspecialchars($search) ?>"
+               style="padding:8px; width:250px;">
+
+        <select name="kategori" style="padding:8px;">
+            <option value="">Semua Kategori</option>
+            <?php foreach ($kategoriList as $k): ?>
+                <option value="<?= $k['id_kategori'] ?>"
+                    <?= ($kategori == $k['id_kategori']) ? 'selected' : '' ?>>
+                    <?= $k['nama_kategori'] ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <select name="penerbit" style="padding:8px;">
+            <option value="">Semua Penerbit</option>
+            <?php foreach ($penerbitList as $p): ?>
+                <option value="<?= $p['id_penerbit'] ?>"
+                    <?= ($penerbit == $p['id_penerbit']) ? 'selected' : '' ?>>
+                    <?= $p['nama_penerbit'] ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <input type="number" name="tahun" placeholder="Tahun"
+               value="<?= htmlspecialchars(trim($tahun)) ?>"
+               style="padding:8px; width:110px;">
+
+        <button type="submit" style="padding:8px 16px; background:#444; color:white;">Filter</button>
+
+        <a href="<?= BASE_URL ?>buku" 
+           style="padding:8px 16px; background:#aaa; border-radius:4px; text-decoration:none; color:black;">
+           Reset
+        </a>
+    </form>
 
     <table class="table">
         <tr>
@@ -219,67 +247,51 @@
             <th>Kategori</th>
             <th>Penerbit</th>
             <th>Stok</th>
+            <!-- <th>ISBN</th> -->
             <th>Aksi</th>
         </tr>
 
-        <?php if (!empty($data)): ?>
-            <?php foreach ($data as $row): ?>
+        <?php if (!empty($buku)): ?>
+            <?php foreach ($buku as $row): ?>
             <tr>
                 <td><?= $row['id_buku'] ?></td>
                 <td><?= htmlspecialchars($row['judul']) ?></td>
                 <td><?= htmlspecialchars($row['pengarang']) ?></td>
-                <td><?= htmlspecialchars($row['tahun_terbit']) ?></td>
-                <td><?= htmlspecialchars($row['nama_kategori']) ?></td>
-                <td><?= htmlspecialchars($row['nama_penerbit']) ?></td>
-                <td><?= htmlspecialchars($row['stok']) ?></td>
+                <td><?= $row['tahun_terbit'] ?></td>
+                <td><?= $row['nama_kategori'] ?></td>
+                <td><?= $row['nama_penerbit'] ?></td>
+                <td><?= $row['stok'] ?></td>
+
+
                 <td>
                     <div class="action-group">
                         <a href="<?= BASE_URL ?>buku/edit/<?= $row['id_buku'] ?>">
-                            <button class="action-btn btn-edit">
-                                <i class="fas fa-pen"></i>
-                            </button>
+                            <button class="action-btn btn-edit"><i class="fas fa-pen"></i></button>
                         </a>
-                        <a href="<?= BASE_URL ?>buku/delete/<?= $row['id_buku'] ?>" onclick="return confirm('Hapus buku ini?')">
-                            <button class="action-btn btn-delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <a href="<?= BASE_URL ?>buku/delete/<?= $row['id_buku'] ?>"
+                           onclick="return confirm('Hapus buku ini?')">
+                            <button class="action-btn btn-delete"><i class="fas fa-trash"></i></button>
                         </a>
                     </div>
                 </td>
             </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="8" style="text-align:center; padding:15px;">Tidak ada data</td></tr>
+            <tr><td colspan="9" style="padding:15px;">Tidak ada data</td></tr>
         <?php endif; ?>
     </table>
 
-    <!-- Pagination -->
-    <div class="pagination" style="margin-top:15px;">
-        <?php for ($i = 1; $i <= $totalPage; $i++): ?>
-            <a href="<?= BASE_URL ?>buku?page=<?= $i ?>&search=<?= urlencode($_GET['search'] ?? '') ?>"
-               class="<?= ($i == ($page ?? 1)) ? 'active' : '' ?>">
-               <?= $i ?>
-            </a>
-        <?php endfor; ?>
-    </div>
+<div class="pagination" style="margin-top:15px;">
+<?php for ($i = 1; $i <= $totalPage; $i++): ?>
+    <a href="<?= BASE_URL ?>buku?page=<?= $i ?>&search=<?= urlencode($search) ?>&kategori=<?= urlencode($kategori) ?>&penerbit=<?= urlencode($penerbit) ?>&tahun=<?= urlencode($tahun) ?>"
+       class="<?= ($i == $page) ? 'active' : '' ?>">
+        <?= $i ?>
+    </a>
+<?php endfor; ?>
 </div>
 
-<script>
-let typingTimer;
-let delay = 500;
 
-document.getElementById("search").addEventListener("keyup", function () {
-    clearTimeout(typingTimer);
-    const keyword = this.value;
-    typingTimer = setTimeout(() => {
-        window.location.href = "<?= BASE_URL ?>buku?search=" + encodeURIComponent(keyword);
-    }, delay);
-});
-
-document.getElementById("btnSearch").addEventListener("click", function () {
-    const keyword = document.getElementById("search").value;
-    window.location.href = "<?= BASE_URL ?>buku?search=" + encodeURIComponent(keyword);
-});
-</script>
+    </div>
+</div>
 
 <?php include __DIR__ . '/../template/footer.php'; ?>

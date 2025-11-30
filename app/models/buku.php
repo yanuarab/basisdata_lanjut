@@ -1,127 +1,185 @@
-<?php
-
+<?php  
 class Buku {
-
     private $db;
 
     public function __construct($pdo) {
         $this->db = $pdo;
     }
 
-    /**
-     * Pagination + Search — sekarang pakai JOIN untuk nama kategori & penerbit
-     */
-    public function getPagination($limit, $offset, $keyword = '') {
-        $keyword = "%$keyword%";
+    // ============================================================
+    // GET DATA + FILTER + PAGINATION
+    // ============================================================
+    public function getPagination($limit, $offset, $search = '', $kategori = '', $penerbit = '', $tahun = '') {
 
+        $params = [];
         $sql = "SELECT b.*, k.nama_kategori, p.nama_penerbit
                 FROM buku b
-                LEFT JOIN kategori_buku k ON k.id_kategori = b.id_kategori
-                LEFT JOIN penerbit p ON p.id_penerbit = b.id_penerbit
-                WHERE b.judul ILIKE :keyword
-                   OR b.pengarang ILIKE :keyword
-                ORDER BY b.id_buku ASC
-                LIMIT :limit OFFSET :offset";
+                LEFT JOIN kategori_buku k ON b.id_kategori = k.id_kategori
+                LEFT JOIN penerbit p ON b.id_penerbit = p.id_penerbit
+                WHERE 1=1";
+
+        // Filter Search
+        if ($search !== null && trim($search) !== '') {
+            $sql .= " AND (b.judul ILIKE :search OR b.pengarang ILIKE :search)";
+            $params[':search'] = "%$search%";
+        }
+
+        // Filter Kategori
+        if ($kategori !== null && trim($kategori) !== '') {
+            $sql .= " AND b.id_kategori = :kategori";
+            $params[':kategori'] = $kategori;
+        }
+
+        // Filter Penerbit
+        if ($penerbit !== null && trim($penerbit) !== '') {
+            $sql .= " AND b.id_penerbit = :penerbit";
+            $params[':penerbit'] = $penerbit;
+        }
+
+        // Filter Tahun Terbit
+        if ($tahun !== null && trim($tahun) !== '') {
+            $sql .= " AND b.tahun_terbit = :tahun";
+            $params[':tahun'] = $tahun;
+        }
+
+        $sql .= " ORDER BY b.id_buku ASC LIMIT :limit OFFSET :offset";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':keyword', $keyword);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
 
-        return $stmt->fetchAll();
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Count (tetap sederhana)
-     */
-    public function countData($keyword = '') {
-        $keyword = "%$keyword%";
+    // ============================================================
+    // TOTAL DATA
+    // ============================================================
+    public function getTotalData($search = '', $kategori = '', $penerbit = '', $tahun = '') {
 
-        $sql = "SELECT COUNT(*) AS total FROM buku
-                WHERE judul ILIKE :keyword 
-                   OR pengarang ILIKE :keyword";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':keyword', $keyword);
-        $stmt->execute();
-
-        return $stmt->fetch()['total'];
-    }
-
-    /**
-     * Ambil satu buku lengkap (dengan nama kategori & penerbit)
-     */
-    public function getById($id) {
-        $sql = "SELECT b.*, k.nama_kategori, p.nama_penerbit
+        $params = [];
+        $sql = "SELECT COUNT(*) AS total
                 FROM buku b
-                LEFT JOIN kategori_buku k ON k.id_kategori = b.id_kategori
-                LEFT JOIN penerbit p ON p.id_penerbit = b.id_penerbit
-                WHERE b.id_buku = :id
-                LIMIT 1";
+                LEFT JOIN kategori_buku k ON b.id_kategori = k.id_kategori
+                LEFT JOIN penerbit p ON b.id_penerbit = p.id_penerbit
+                WHERE 1=1";
+
+        if ($search !== null && trim($search) !== '') {
+            $sql .= " AND (b.judul ILIKE :search OR b.pengarang ILIKE :search)";
+            $params[':search'] = "%$search%";
+        }
+
+        if ($kategori !== null && trim($kategori) !== '') {
+            $sql .= " AND b.id_kategori = :kategori";
+            $params[':kategori'] = $kategori;
+        }
+
+        if ($penerbit !== null && trim($penerbit) !== '') {
+            $sql .= " AND b.id_penerbit = :penerbit";
+            $params[':penerbit'] = $penerbit;
+        }
+
+        if ($tahun !== null && trim($tahun) !== '') {
+            $sql .= " AND b.tahun_terbit = :tahun";
+            $params[':tahun'] = $tahun;
+        }
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        return $stmt->fetch();
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     }
 
-    public function getAllKategori() {
-        $stmt = $this->db->query("SELECT * FROM kategori_buku ORDER BY nama_kategori ASC");
-        return $stmt->fetchAll();
+    // ============================================================
+    // GET BY ID
+    // ============================================================
+    public function getById($id) {
+        $sql = "SELECT * FROM buku WHERE id_buku = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getAllPenerbit() {
-        $stmt = $this->db->query("SELECT * FROM penerbit ORDER BY nama_penerbit ASC");
-        return $stmt->fetchAll();
-    }
-
-    /**
-     * Create (pastikan placeholder & kolom sesuai)
-     */
+    // ============================================================
+    // CREATE
+    // ============================================================
     public function create($data) {
-        $sql = "INSERT INTO buku (judul, pengarang, tahun_terbit, id_kategori, id_penerbit, stok)
-                VALUES (:judul, :pengarang, :tahun_terbit, :id_kategori, :id_penerbit, :stok)";
+        $sql = "INSERT INTO buku (judul, pengarang, tahun_terbit, id_kategori, id_penerbit, stok, isbn)
+                VALUES (:judul, :pengarang, :tahun_terbit, :kategori, :penerbit, :stok, :isbn)";
+
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':judul' => $data['judul'],
-            ':pengarang' => $data['pengarang'],
-            ':tahun_terbit' => $data['tahun_terbit'],
-            ':id_kategori' => $data['id_kategori'],
-            ':id_penerbit' => $data['id_penerbit'],
-            ':stok' => $data['stok'],
-        ]);
+
+        $stmt->bindValue(':judul', $data['judul']);
+        $stmt->bindValue(':pengarang', $data['pengarang']);
+        $stmt->bindValue(':tahun_terbit', $data['tahun_terbit']);
+        $stmt->bindValue(':kategori', $data['id_kategori']);
+        $stmt->bindValue(':penerbit', $data['id_penerbit']);
+        $stmt->bindValue(':stok', $data['stok']);
+        $stmt->bindValue(':isbn', $data['isbn']);
+
+        return $stmt->execute();
     }
 
-    /**
-     * Update
-     */
-    public function update($data) {
+    // ============================================================
+    // UPDATE
+    // ============================================================
+    public function update($id, $data) {
+
         $sql = "UPDATE buku SET
                     judul = :judul,
                     pengarang = :pengarang,
                     tahun_terbit = :tahun_terbit,
-                    id_kategori = :id_kategori,
-                    id_penerbit = :id_penerbit,
-                    stok = :stok
-                WHERE id_buku = :id_buku";
-                 
+                    id_kategori = :kategori,
+                    id_penerbit = :penerbit,
+                    stok = :stok,
+                    isbn = :isbn
+                WHERE id_buku = :id";
+
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':judul' => $data['judul'],
-            ':pengarang' => $data['pengarang'],
-            ':tahun_terbit' => $data['tahun_terbit'],
-            ':id_kategori' => $data['id_kategori'],
-            ':id_penerbit' => $data['id_penerbit'],
-            ':stok' => $data['stok'],
-            ':id_buku' => $data['id_buku']
-        ]);
+
+        $stmt->bindValue(':judul', $data['judul']);
+        $stmt->bindValue(':pengarang', $data['pengarang']);
+        $stmt->bindValue(':tahun_terbit', $data['tahun_terbit']);
+        $stmt->bindValue(':kategori', $data['id_kategori']);
+        $stmt->bindValue(':penerbit', $data['id_penerbit']);
+        $stmt->bindValue(':stok', $data['stok']);
+        $stmt->bindValue(':isbn', $data['isbn']);
+        $stmt->bindValue(':id', $id);
+
+        return $stmt->execute();
     }
 
-    /**
-     * Delete
-     */
+    // ============================================================
+    // DELETE
+    // ============================================================
     public function delete($id) {
-        $stmt = $this->db->prepare("DELETE FROM buku WHERE id_buku = :id");
-        return $stmt->execute(['id' => $id]);
+        $sql = "DELETE FROM buku WHERE id_buku = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id);
+        return $stmt->execute();
     }
+
+
+    public function getKategoriList() {
+        return $this->db->query("SELECT * FROM kategori_buku ORDER BY nama_kategori")
+                        ->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getPenerbitList() {
+        return $this->db->query("SELECT * FROM penerbit ORDER BY nama_penerbit")
+                        ->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
+
+?>

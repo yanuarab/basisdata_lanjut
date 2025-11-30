@@ -41,7 +41,7 @@ class PeminjamanController
             'id_buku' => $_POST['id_buku'],
             'tanggal_pinjam' => $_POST['tanggal_pinjam'],
             'tanggal_kembali' => $_POST['tanggal_kembali'] ?: null,
-            'status' => $_POST['status']
+          'status' => $_POST['status']
         ]);
 
         header("Location: " . BASE_URL . "peminjaman");

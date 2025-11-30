@@ -219,6 +219,13 @@
         </li>
 
         <li>
+            <a href="<?= BASE_URL ?>pengembalian">
+                <i class="fas fa-handshake"></i>
+                <span>Pengembalian</span>
+            </a>
+        </li>
+        
+        <li>
             <a href="<?= BASE_URL ?>laporan">
                 <i class="fas fa-file"></i>
                 <span>Laporan</span>
