@@ -13,7 +13,7 @@ class Database {
         $DB_PORT = '5433';
         $DB_NAME = 'uts_perpustakaan';
         $DB_USER = 'postgres';
-        $DB_PASS = '12345678';
+        $DB_PASS = '12345';
 
         try {
             $dsn = "pgsql:host={$DB_HOST};port={$DB_PORT};dbname={$DB_NAME};";

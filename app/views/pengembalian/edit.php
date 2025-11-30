@@ -10,41 +10,30 @@
 
     <form action="<?= BASE_URL ?>pengembalian/update" method="POST">
 
-        <input type="hidden" name="id_pengembalian" value="<?= $data['id_pengembalian'] ?>">
+        <input type="hidden" name="id_pengembalian" value="<?= htmlspecialchars($data['id_pengembalian'] ?? '') ?>">
+        <input type="hidden" name="id_peminjaman" value="<?= htmlspecialchars($data['id_peminjaman'] ?? '') ?>">
 
         <div class="row-flex">
 
             <div class="col">
                 <label>Anggota</label>
-                <select name="id_anggota" class="input" required>
-                    <?php foreach ($anggota as $a): ?>
-                        <option value="<?= $a['id_anggota'] ?>" 
-                            <?= $a['id_anggota'] == $data['id_anggota'] ? 'selected' : '' ?>>
-                            <?= $a['nama'] ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                <input type="text" class="input" value="<?= htmlspecialchars($data['nama_anggota'] ?? '') ?>" readonly>
             </div>
 
             <div class="col">
                 <label>Buku</label>
-                <select name="id_buku" class="input" required>
-                    <?php foreach ($buku as $b): ?>
-                        <option value="<?= $b['id_buku'] ?>" 
-                            <?= $b['id_buku'] == $data['id_buku'] ? 'selected' : '' ?>>
-                            <?= $b['judul'] ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                <input type="text" class="input" value="<?= htmlspecialchars($data['judul_buku'] ?? '') ?>" readonly>
             </div>
 
         </div>
 
-        <label>Tanggal Kembali</label>
-        <input type="date" class="input" name="tanggal_kembali" value="<?= $data['tanggal_kembali'] ?>" required>
+        <label>Tanggal Pengembalian</label>
+        <input type="date" class="input" name="tanggal_pengembalian" 
+               value="<?= htmlspecialchars($data['tanggal_pengembalian'] ?? '') ?>">
 
         <label>Denda</label>
-        <input type="number" class="input" name="denda" value="<?= $data['denda'] ?>">
+        <input type="number" class="input" name="denda" step="0.01"
+               value="<?= htmlspecialchars($data['denda'] ?? 0) ?>">
 
         <button class="btn-submit" type="submit">Update</button>
         <a href="<?= BASE_URL ?>pengembalian" class="btn-back">← Kembali</a>

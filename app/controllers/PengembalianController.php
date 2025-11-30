@@ -2,63 +2,88 @@
 require_once __DIR__ . '/../models/Pengembalian.php';
 
 class PengembalianController {
+
     private $model;
 
     public function __construct($pdo) {
         $this->model = new Pengembalian($pdo);
     }
 
-    // ===========================
-    // LIST / INDEX
-    // ===========================
-    public function index()
-    {
+    public function index() {
         $keyword = $_GET['search'] ?? '';
 
         $limit = 10;
-        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
         $offset = ($page - 1) * $limit;
 
         $totalData = $this->model->countData($keyword);
-        $totalPage = ceil($totalData / $limit);
+        $totalPage = (int) ceil($totalData / $limit);
 
         $data = $this->model->getPagination($limit, $offset, $keyword);
 
         require_once __DIR__ . '/../views/pengembalian/index.php';
     }
 
-    // ===========================
-    // CREATE / STORE
-    // ===========================
-    public function store($id_peminjaman, $tanggal_pengembalian, $denda) {
-        return $this->model->store($id_peminjaman, $tanggal_pengembalian, $denda);
+    public function create() {
+        $anggota = $this->model->anggotaList();
+        $buku = $this->model->bukuList();
+        $peminjaman = $this->model->peminjamanList();
+
+        require_once __DIR__ . '/../views/pengembalian/create.php';
     }
 
-    // ===========================
-    // GET BY ID
-    // ===========================
-    public function find($id) {
-        return $this->model->find($id);
+    public function store() {
+        // Basic validation: pastikan id_peminjaman ada
+        $id_peminjaman = $_POST['id_peminjaman'] ?? null;
+        $tanggal_pengembalian = $_POST['tanggal_pengembalian'] ?? null;
+        $denda = $_POST['denda'] ?? 0;
+
+        if (empty($id_peminjaman)) {
+            // bisa set flash message atau redirect dengan pesan error
+            header("Location: " . BASE_URL . "pengembalian/create");
+            exit;
+        }
+
+        $this->model->store($id_peminjaman, $tanggal_pengembalian, $denda);
+
+        header("Location: " . BASE_URL . "pengembalian");
+        exit;
     }
 
-    // ===========================
-    // UPDATE
-    // ===========================
-    public function update($id, $id_peminjaman, $tanggal_pengembalian, $denda) {
-        return $this->model->update($id, $id_peminjaman, $tanggal_pengembalian, $denda);
+    public function edit($id) {
+        $data = $this->model->find($id);
+
+        if (!$data) {
+            // item tidak ditemukan
+            header("Location: " . BASE_URL . "pengembalian");
+            exit;
+        }
+
+        require_once __DIR__ . '/../views/pengembalian/edit.php';
     }
 
-    // ===========================
-    // DELETE
-    // ===========================
+    public function update() {
+        // Pastikan field penting ada
+        $id_pengembalian = $_POST['id_pengembalian'] ?? null;
+        $id_peminjaman = $_POST['id_peminjaman'] ?? null; // harus dikirim sebagai hidden
+        $tanggal_pengembalian = $_POST['tanggal_pengembalian'] ?? null;
+        $denda = $_POST['denda'] ?? 0;
+
+        if (empty($id_pengembalian) || empty($id_peminjaman)) {
+            // invalid request, redirect ke list
+            header("Location: " . BASE_URL . "pengembalian");
+            exit;
+        }
+
+        $this->model->update($id_pengembalian, $id_peminjaman, $tanggal_pengembalian, $denda);
+
+        header("Location: " . BASE_URL . "pengembalian");
+        exit;
+    }
+
     public function delete($id) {
-        return $this->model->delete($id);
-    }
-
-    // ===========================
-    // PEMINJAMAN LIST
-    // ===========================
-    public function peminjamanList() {
-        return $this->model->peminjamanList();
+        $this->model->delete($id);
+        header("Location: " . BASE_URL . "pengembalian");
+        exit;
     }
 }

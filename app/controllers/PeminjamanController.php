@@ -36,13 +36,20 @@ class PeminjamanController
 
     public function store()
     {
-        $this->model->store([
+        // ambil input yang diperlukan saja
+        $result = $this->model->store([
             'id_anggota' => $_POST['id_anggota'],
             'id_buku' => $_POST['id_buku'],
             'tanggal_pinjam' => $_POST['tanggal_pinjam'],
-            'tanggal_kembali' => $_POST['tanggal_kembali'] ?: null,
-          'status' => $_POST['status']
+            // status diset otomatis di model sebagai 'Dipinjam'
         ]);
+
+        if ($result !== true) {
+            // jika gagal, set flash message dan kembalikan ke form
+            $_SESSION['flash_error'] = "Gagal menyimpan peminjaman: " . $result;
+            header("Location: " . BASE_URL . "peminjaman/create");
+            exit;
+        }
 
         header("Location: " . BASE_URL . "peminjaman");
         exit;

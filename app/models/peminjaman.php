@@ -89,49 +89,162 @@ class Peminjaman
         return $this->pdo->query("SELECT id_buku, judul FROM buku ORDER BY judul")->fetchAll();
     }
 
+    /**
+     * Store peminjaman
+     * - kurangi stok hanya sekali
+     * - set status = 'Dipinjam' secara otomatis
+     */
     public function store($data)
     {
-        $sql = "
-            INSERT INTO peminjaman (id_anggota, id_buku, tanggal_pinjam, tanggal_kembali, status)
-            VALUES (:id_anggota, :id_buku, :tanggal_pinjam, :tanggal_kembali, :status)
-        ";
+        try {
+            $this->pdo->beginTransaction();
 
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':id_anggota' => $data['id_anggota'],
-            ':id_buku'    => $data['id_buku'],
-            ':tanggal_pinjam' => $data['tanggal_pinjam'],
-            ':tanggal_kembali' => $data['tanggal_kembali'] ?: null,
-            ':status' => $data['status']
-        ]);
+            // Kurangi stok buku (hanya jika stok > 0)
+            $sqlStok = "UPDATE buku SET stok = stok - 0 WHERE id_buku = :id_buku AND stok > 0";
+            $stmtStok = $this->pdo->prepare($sqlStok);
+            $stmtStok->execute([':id_buku' => $data['id_buku']]);
+
+            if ($stmtStok->rowCount() == 0) {
+                throw new Exception("Stok buku habis!");
+            }
+
+            // Insert peminjaman (tanggal_kembali tidak diisi di sini)
+            $sql = "
+                INSERT INTO peminjaman (id_anggota, id_buku, tanggal_pinjam, status)
+                VALUES (:id_anggota, :id_buku, :tanggal_pinjam, :status)
+            ";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':id_anggota' => $data['id_anggota'],
+                ':id_buku'    => $data['id_buku'],
+                ':tanggal_pinjam' => $data['tanggal_pinjam'],
+                ':status' => 'Dipinjam'
+            ]);
+
+            $this->pdo->commit();
+            return true;
+
+        } catch (Exception $e) {
+            if ($this->pdo->inTransaction()) $this->pdo->rollBack();
+            return $e->getMessage();
+        }
     }
 
+    /**
+     * Update peminjaman.
+     * Jika buku diganti, stok lama dikembalikan dan stok baru dikurangi (dalam 1 transaksi).
+     */
     public function update($data)
     {
-        $sql = "
-            UPDATE peminjaman SET
-                id_anggota = :id_anggota,
-                id_buku = :id_buku,
-                tanggal_pinjam = :tanggal_pinjam,
-                tanggal_kembali = :tanggal_kembali,
-                status = :status
-            WHERE id_peminjaman = :id_peminjaman
-        ";
+        try {
+            $this->pdo->beginTransaction();
 
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':id_peminjaman' => $data['id_peminjaman'],
-            ':id_anggota' => $data['id_anggota'],
-            ':id_buku' => $data['id_buku'],
-            ':tanggal_pinjam' => $data['tanggal_pinjam'],
-            ':tanggal_kembali' => $data['tanggal_kembali'] ?: null,
-            ':status' => $data['status'],
-        ]);
+            // Ambil data lama
+            $stmtOld = $this->pdo->prepare("SELECT id_buku FROM peminjaman WHERE id_peminjaman = ?");
+            $stmtOld->execute([$data['id_peminjaman']]);
+            $old = $stmtOld->fetch(PDO::FETCH_ASSOC);
+
+            if (!$old) {
+                throw new Exception("Data peminjaman tidak ditemukan");
+            }
+
+            $oldBook = $old['id_buku'];
+            $newBook = $data['id_buku'];
+
+            // Jika buku diganti
+            if ($oldBook != $newBook) {
+
+                // Balikkan stok buku lama
+                $sqlAdd = "UPDATE buku SET stok = stok + 1 WHERE id_buku = ?";
+                $stmtAdd = $this->pdo->prepare($sqlAdd);
+                $stmtAdd->execute([$oldBook]);
+
+                // Kurangi stok buku baru (cek stok > 0)
+                $sqlMin = "UPDATE buku SET stok = stok - 1 WHERE id_buku = ? AND stok > 0";
+                $stmtMin = $this->pdo->prepare($sqlMin);
+                $stmtMin->execute([$newBook]);
+
+                if ($stmtMin->rowCount() == 0) {
+                    throw new Exception("Stok buku baru tidak mencukupi");
+                }
+            }
+
+            // Update peminjaman (tanggal_kembali boleh diisi saat update jika memang mengembalikan)
+            $sql = "
+                UPDATE peminjaman SET
+                    id_anggota = :id_anggota,
+                    id_buku = :id_buku,
+                    tanggal_pinjam = :tanggal_pinjam,
+                    tanggal_kembali = :tanggal_kembali,
+                    status = :status
+                WHERE id_peminjaman = :id_peminjaman
+            ";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':id_peminjaman' => $data['id_peminjaman'],
+                ':id_anggota' => $data['id_anggota'],
+                ':id_buku' => $data['id_buku'],
+                ':tanggal_pinjam' => $data['tanggal_pinjam'],
+                ':tanggal_kembali' => $data['tanggal_kembali'] ?: null,
+                ':status' => $data['status'],
+            ]);
+
+            $this->pdo->commit();
+            return true;
+
+        } catch (Exception $e) {
+            if ($this->pdo->inTransaction()) $this->pdo->rollBack();
+            return $e->getMessage();
+        }
     }
 
+    /**
+     * Delete peminjaman:
+     * - hanya bisa dihapus jika belum ada pengembalian
+     * - stok dikembalikan +1
+     */
     public function delete($id)
     {
-        $stmt = $this->pdo->prepare("DELETE FROM peminjaman WHERE id_peminjaman = :id");
-        return $stmt->execute([':id' => $id]);
+        try {
+            $this->pdo->beginTransaction();
+
+            // Cek apakah sudah pernah dikembalikan
+            $stmtCheck = $this->pdo->prepare("SELECT 1 FROM pengembalian WHERE id_peminjaman = ?");
+            $stmtCheck->execute([$id]);
+
+            if ($stmtCheck->fetch()) {
+                throw new Exception("Tidak dapat menghapus: peminjaman sudah dikembalikan");
+            }
+
+            // Ambil id_buku
+            $stmt = $this->pdo->prepare("SELECT id_buku FROM peminjaman WHERE id_peminjaman = ?");
+            $stmt->execute([$id]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                throw new Exception("Data peminjaman tidak ditemukan");
+            }
+
+            $id_buku = $row['id_buku'];
+
+            // Kembalikan stok buku
+            $sqlStok = "UPDATE buku SET stok = stok + 1 WHERE id_buku = ?";
+            $stmtStok = $this->pdo->prepare($sqlStok);
+            $stmtStok->execute([$id_buku]);
+
+            // Hapus peminjaman
+            $stmtDel = $this->pdo->prepare("DELETE FROM peminjaman WHERE id_peminjaman = ?");
+            $stmtDel->execute([$id]);
+
+            $this->pdo->commit();
+            return true;
+
+        } catch (Exception $e) {
+            if ($this->pdo->inTransaction()) $this->pdo->rollBack();
+            return $e->getMessage();
+        }
     }
+
 }

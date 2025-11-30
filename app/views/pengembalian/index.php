@@ -2,7 +2,7 @@
 <?php include __DIR__ . '/../template/sidebar.php'; ?>
 
 <style>
-/* SAMA PERSIS SEPERTI PADA PEMINJAMAN */
+
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -153,7 +153,6 @@
             <th>Tgl Pinjam</th>
             <th>Tgl Kembali</th>
             <th>Denda</th>
-            <th>Status</th>
             <th>Aksi</th>
         </tr>
 
@@ -166,7 +165,6 @@
                 <td><?= htmlspecialchars($row['tanggal_pinjam']) ?></td>
                 <td><?= htmlspecialchars($row['tanggal_kembali'] ?? '-') ?></td>
                 <td><?= htmlspecialchars($row['denda'] ?? '0') ?></td>
-                <td><?= htmlspecialchars($row['status']) ?></td>
 
                 <td>
                     <div class="action-group">

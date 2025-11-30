@@ -36,15 +36,6 @@
         <label>Tanggal Pinjam</label>
         <input type="date" class="input" name="tanggal_pinjam" required>
 
-        <label>Tanggal Kembali</label>
-        <input type="date" class="input" name="tanggal_kembali">
-
-        <label>Status</label>
-        <select name="status" class="input" required>
-            <option value="Dipinjam">Dipinjam</option>
-            <option value="Dikembalikan">Dikembalikan</option>
-        </select>
-
         <button class="btn-submit" type="submit">Simpan</button>
         <a href="<?= BASE_URL ?>peminjaman" class="btn-back">← Kembali</a>
 

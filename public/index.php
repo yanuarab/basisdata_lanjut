@@ -99,58 +99,23 @@ if (preg_match('/^peminjaman\/delete\/(\d+)$/', $uri, $m)) { $peminjaman->delete
    PENGEMBALIAN
 ============================================= */
 
-// LIST
-if ($uri === 'pengembalian') { 
-    $data = $pengembalian->index(); 
-    // contoh: include view pengembalian/index.php di sini
-    exit;
-}
+// LIST DATA
+if ($uri === 'pengembalian') { $pengembalian->index(); exit; }
 
 // FORM CREATE
-if ($uri === 'pengembalian/create') { 
-    // biasanya hanya load view form create
-    include __DIR__ . '/../app/views/pengembalian/create.php';
-    exit; 
-}
+if ($uri === 'pengembalian/create') { $pengembalian->create(); exit; }
 
-// STORE (POST)
-if ($uri === 'pengembalian/store') { 
-    $id_peminjaman = $_POST['id_peminjaman'] ?? null;
-    $tanggal_pengembalian = $_POST['tanggal_pengembalian'] ?? null;
-    $denda = $_POST['denda'] ?? 0;
-
-    $pengembalian->store($id_peminjaman, $tanggal_pengembalian, $denda);
-    header('Location: /pengembalian'); // redirect ke list
-    exit; 
-}
+// STORE DATA (POST)
+if ($uri === 'pengembalian/store') { $pengembalian->store(); exit; }
 
 // FORM EDIT
-if (preg_match('/^pengembalian\/edit\/(\d+)$/', $uri, $m)) { 
-    $id = $m[1];
-    $item = $pengembalian->find($id);
-    include __DIR__ . '/../app/views/pengembalian/edit.php';
-    exit; 
-}
+if (preg_match('/^pengembalian\/edit\/(\d+)$/', $uri, $m)) { $pengembalian->edit($m[1]); exit; }
 
-// UPDATE (POST)
-if ($uri === 'pengembalian/update') { 
-    $id = $_POST['id'] ?? null;
-    $id_peminjaman = $_POST['id_peminjaman'] ?? null;
-    $tanggal_pengembalian = $_POST['tanggal_pengembalian'] ?? null;
-    $denda = $_POST['denda'] ?? 0;
+// UPDATE DATA (POST)
+if ($uri === 'pengembalian/update') { $pengembalian->update(); exit; }
 
-    $pengembalian->update($id, $id_peminjaman, $tanggal_pengembalian, $denda);
-    header('Location: /pengembalian'); // redirect ke list
-    exit; 
-}
-
-// DELETE
-if (preg_match('/^pengembalian\/delete\/(\d+)$/', $uri, $m)) { 
-    $id = $m[1];
-    $pengembalian->delete($id);
-    header('Location: /pengembalian'); // redirect ke list
-    exit; 
-}
+// DELETE DATA
+if (preg_match('/^pengembalian\/delete\/(\d+)$/', $uri, $m)) { $pengembalian->delete($m[1]); exit; }
 
 
 /* ============================================
