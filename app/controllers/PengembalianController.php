@@ -1,11 +1,14 @@
 <?php
 require_once __DIR__ . '/../models/Pengembalian.php';
+require_once __DIR__ . '/../models/Buku.php';
+
 
 class PengembalianController {
-
+    private $pdo;
     private $model;
 
     public function __construct($pdo) {
+        $this->pdo = $pdo; 
         $this->model = new Pengembalian($pdo);
     }
 
@@ -32,23 +35,18 @@ class PengembalianController {
         require_once __DIR__ . '/../views/pengembalian/create.php';
     }
 
-    public function store() {
-        // Basic validation: pastikan id_peminjaman ada
-        $id_peminjaman = $_POST['id_peminjaman'] ?? null;
-        $tanggal_pengembalian = $_POST['tanggal_pengembalian'] ?? null;
-        $denda = $_POST['denda'] ?? 0;
+public function store() {
+    $id_peminjaman = $_POST['id_peminjaman'];
+    $tanggal_pengembalian = $_POST['tanggal_pengembalian'];
+    $denda = $_POST['denda'] ?? 0;
 
-        if (empty($id_peminjaman)) {
-            // bisa set flash message atau redirect dengan pesan error
-            header("Location: " . BASE_URL . "pengembalian/create");
-            exit;
-        }
+    $this->model->store($id_peminjaman, $tanggal_pengembalian, $denda);
 
-        $this->model->store($id_peminjaman, $tanggal_pengembalian, $denda);
+    header("Location: " . BASE_URL . "pengembalian");
+    exit;
+}
 
-        header("Location: " . BASE_URL . "pengembalian");
-        exit;
-    }
+
 
     public function edit($id) {
         $data = $this->model->find($id);
@@ -62,28 +60,39 @@ class PengembalianController {
         require_once __DIR__ . '/../views/pengembalian/edit.php';
     }
 
-    public function update() {
-        // Pastikan field penting ada
-        $id_pengembalian = $_POST['id_pengembalian'] ?? null;
-        $id_peminjaman = $_POST['id_peminjaman'] ?? null; // harus dikirim sebagai hidden
-        $tanggal_pengembalian = $_POST['tanggal_pengembalian'] ?? null;
-        $denda = $_POST['denda'] ?? 0;
+public function update() {
+    $id_pengembalian = $_POST['id_pengembalian'] ?? null;
+    $id_peminjaman = $_POST['id_peminjaman'] ?? null;
+    $tanggal_pengembalian = $_POST['tanggal_pengembalian'] ?? null;
+    $denda = $_POST['denda'] ?? 0;
 
-        if (empty($id_pengembalian) || empty($id_peminjaman)) {
-            // invalid request, redirect ke list
-            header("Location: " . BASE_URL . "pengembalian");
-            exit;
-        }
-
-        $this->model->update($id_pengembalian, $id_peminjaman, $tanggal_pengembalian, $denda);
-
+    if (empty($id_pengembalian) || empty($id_peminjaman)) {
         header("Location: " . BASE_URL . "pengembalian");
         exit;
     }
+
+    // 1. Update data pengembalian
+    $this->model->update($id_pengembalian, $id_peminjaman, $tanggal_pengembalian, $denda);
+
+    // 2. Ambil id_buku dari peminjaman
+    $peminjaman = $this->model->getPeminjamanById($id_peminjaman);
+    $id_buku = $peminjaman['id_buku'];
+
+    // 3. Tambah stok buku +1
+    $bukuModel = new Buku($this->pdo);
+    $bukuModel->tambahStok($id_buku);
+
+
+    header("Location: " . BASE_URL . "pengembalian");
+    exit;
+}
+
 
     public function delete($id) {
         $this->model->delete($id);
         header("Location: " . BASE_URL . "pengembalian");
         exit;
     }
+
+
 }

@@ -27,6 +27,37 @@
 .table th {
     text-align: left;
 }
+
+/* Button Tambah Data */
+.btn-add {
+    padding: 12px 28px;
+    text-decoration: none;
+    color: black;
+    border-radius: 50px;
+    cursor: pointer;
+    border: 0;
+    background-color: white;
+    box-shadow: rgb(0 0 0 / 5%) 0 0 8px;
+    letter-spacing: 1px;
+    font-size: 15px;
+    transition: all 0.4s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-add:hover {
+    letter-spacing: 2px;
+    background-color: hsl(261deg 80% 48%);
+    color: white;
+    box-shadow: rgb(93 24 220) 0px 7px 29px 0px;
+}
+
+.btn-add:active {
+    background-color: hsl(261deg 80% 48%);
+    color: white;
+    transform: translateY(5px);
+}
 </style>
 
 <div class="content">
@@ -39,9 +70,8 @@
     <?php endif; ?>
 
     <a href="<?= BASE_URL ?>buku-populer/refresh" 
-       class="btn btn-primary" 
-       style="margin-bottom:10px;display:inline-block;">
-        🔄 Refresh Data
+       class="btn-add" >
+        <i class="fas fa-refresh"></i>Refresh Data
     </a>
 
     <table class="table">

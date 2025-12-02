@@ -46,6 +46,9 @@ public function index() {
     // FORM TAMBAH
     // ===========================
     public function create() {
+        $kategori = $this->buku->getKategoriList();
+        $penerbit = $this->buku->getPenerbitList();
+
         include __DIR__ . "/../views/buku/create.php";
     }
 
@@ -64,24 +67,38 @@ public function index() {
         ];
 
         $this->buku->create($data);
-        header("Location: index.php?msg=created");
+        header("Location: " . BASE_URL . "buku?msg=created");
+        exit;
+
     }
 
 
     // ===========================
     // FORM EDIT
     // ===========================
-    public function edit() {
-        $id = $_GET['id'];
-        $data['buku'] = $this->buku->getById($id);
-        include __DIR__ . "/../views/buku/edit.php";
+public function edit($id)
+{
+    $buku = $this->buku->getById($id);
+
+    if (!$buku) {
+        die("Data buku tidak ditemukan!");
     }
+
+    $kategori = $this->buku->getKategoriList();
+    $penerbit = $this->buku->getPenerbitList();
+
+
+    require_once __DIR__ . '/../views/buku/edit.php';
+}
+
+
+    
 
     // ===========================
     // UPDATE DATA
     // ===========================
     public function update() {
-        $id = $_POST['id'];
+        $id = $_POST['id_buku'];
 
         $data = [
             'judul'         => $_POST['judul'],
@@ -94,9 +111,10 @@ public function index() {
         ];
 
         $this->buku->update($id, $data);
-        header("Location: index.php?msg=updated");
+        header("Location: " . BASE_URL . "buku?msg=updated");
+        exit;
     }
-
+    
 
     // ===========================
     // HAPUS DATA
@@ -104,7 +122,8 @@ public function index() {
     public function delete() {
         $id = $_GET['id'];
         $this->buku->delete($id);
-        header("Location: index.php?msg=deleted");
+        header("Location: " . BASE_URL . "buku?msg=deleted");
+        exit;
     }
 }
 ?>

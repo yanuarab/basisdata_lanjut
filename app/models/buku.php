@@ -1,9 +1,9 @@
 <?php  
 class Buku {
-    private $db;
+    private $pdo;
 
     public function __construct($pdo) {
-        $this->db = $pdo;
+        $this->pdo = $pdo;
     }
 
     // ============================================================
@@ -44,7 +44,7 @@ class Buku {
 
         $sql .= " ORDER BY b.id_buku ASC LIMIT :limit OFFSET :offset";
 
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
 
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
@@ -89,7 +89,7 @@ class Buku {
             $params[':tahun'] = $tahun;
         }
 
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
 
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
@@ -104,7 +104,7 @@ class Buku {
     // ============================================================
     public function getById($id) {
         $sql = "SELECT * FROM buku WHERE id_buku = :id";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':id', $id);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -117,7 +117,7 @@ class Buku {
         $sql = "INSERT INTO buku (judul, pengarang, tahun_terbit, id_kategori, id_penerbit, stok, isbn)
                 VALUES (:judul, :pengarang, :tahun_terbit, :kategori, :penerbit, :stok, :isbn)";
 
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
 
         $stmt->bindValue(':judul', $data['judul']);
         $stmt->bindValue(':pengarang', $data['pengarang']);
@@ -145,7 +145,7 @@ class Buku {
                     isbn = :isbn
                 WHERE id_buku = :id";
 
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
 
         $stmt->bindValue(':judul', $data['judul']);
         $stmt->bindValue(':pengarang', $data['pengarang']);
@@ -164,22 +164,32 @@ class Buku {
     // ============================================================
     public function delete($id) {
         $sql = "DELETE FROM buku WHERE id_buku = :id";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':id', $id);
         return $stmt->execute();
     }
 
 
     public function getKategoriList() {
-        return $this->db->query("SELECT * FROM kategori_buku ORDER BY nama_kategori")
+        return $this->pdo->query("SELECT * FROM kategori_buku ORDER BY nama_kategori")
                         ->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getPenerbitList() {
-        return $this->db->query("SELECT * FROM penerbit ORDER BY nama_penerbit")
+        return $this->pdo->query("SELECT * FROM penerbit ORDER BY nama_penerbit")
                         ->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function tambahStok($id_buku) {
+        $stmt = $this->pdo->prepare("UPDATE buku SET stok = stok + 0 WHERE id_buku = ?");
+        return $stmt->execute([$id_buku]);
+    }
+
+    public function getPeminjamanById($id_peminjaman) {
+        $stmt = $this->pdo->prepare("SELECT * FROM peminjaman WHERE id_peminjaman = ?");
+        $stmt->execute([$id_peminjaman]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }
 
 ?>

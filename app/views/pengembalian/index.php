@@ -163,7 +163,7 @@
                 <td><?= htmlspecialchars($row['nama_anggota'] ?? '-') ?></td>
                 <td><?= htmlspecialchars($row['judul_buku'] ?? '-') ?></td>
                 <td><?= htmlspecialchars($row['tanggal_pinjam']) ?></td>
-                <td><?= htmlspecialchars($row['tanggal_kembali'] ?? '-') ?></td>
+                <td><?= htmlspecialchars($row['tanggal_pengembalian'] ?? '-') ?></td>
                 <td><?= htmlspecialchars($row['denda'] ?? '0') ?></td>
 
                 <td>

@@ -190,6 +190,24 @@ $tahun    = trim($_GET['tahun']    ?? '');
     transform: translateY(80%);
     font-size: 26px;
 }
+
+.alert-success {
+    padding: 10px;
+    background: #d4edda8e;
+    border-left: 5px solid #28a74698;
+    margin-top: 10px;
+    border-radius: 5px;
+    color: #226231ff;
+}
+
+.alert-danger {
+    padding: 10px;
+    background: #edd4d48e;
+    border-left: 5px solid #a7282898;
+    margin-top: 10px;
+    border-radius: 5px;
+    color: #622222ff;
+}
 </style>
 
 
@@ -199,6 +217,27 @@ $tahun    = trim($_GET['tahun']    ?? '');
     <a href="<?= BASE_URL ?>buku/create" class="btn-add">
         <i class="fas fa-plus"></i> Tambah Buku
     </a>
+
+    <div style="margin-top: 20px;">
+    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'created'): ?>
+        <div class="alert alert-success">
+            Buku telah dibuat!
+        </div>
+    <?php endif; ?>
+
+    <div style="margin-top: 20px;">
+    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'updated'): ?>
+        <div class="alert alert-success">
+            Buku telah diedit!
+        </div>
+    <?php endif; ?>
+
+    <div style="margin-top: 20px;">
+    <?php if (isset($_GET['msg']) && $_GET['msg'] === 'deleted'): ?>
+        <div class="alert alert-danger">
+            Buku telah dihapus!
+        </div>
+    <?php endif; ?>
 
     <!-- FILTER -->
     <form method="GET" style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">

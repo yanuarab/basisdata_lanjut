@@ -55,12 +55,21 @@ public function store($id_peminjaman, $tanggal_pengembalian, $denda)
         // Insert pengembalian
         $sql = "INSERT INTO pengembalian (id_peminjaman, tanggal_pengembalian, denda)
                 VALUES (?, ?, ?)";
-
         $stmtInsert = $this->pdo->prepare($sql);
         $stmtInsert->execute([
             $id_peminjaman,
             $tanggal_pengembalian ?: null,
             $denda ?: 0
+        ]);
+
+        // 🔥 Update tabel peminjaman
+        $sqlUpdatePinjam = "UPDATE peminjaman 
+                            SET tanggal_kembali = ?, status = 'Dikembalikan'
+                            WHERE id_peminjaman = ?";
+        $stmtUpdatePinjam = $this->pdo->prepare($sqlUpdatePinjam);
+        $stmtUpdatePinjam->execute([
+            $tanggal_pengembalian ?: null,
+            $id_peminjaman
         ]);
 
         $this->pdo->commit();
@@ -71,6 +80,7 @@ public function store($id_peminjaman, $tanggal_pengembalian, $denda)
         return $e->getMessage();
     }
 }
+
 
 
     public function getPagination($limit, $offset, $search = "") {
@@ -152,16 +162,43 @@ public function store($id_peminjaman, $tanggal_pengembalian, $denda)
      * Update: tetap meng-set id_peminjaman (dari hidden input), tanggal_pengembalian, denda.
      * Pastikan controller mengirimkan id_peminjaman yang valid (bukan NULL).
      */
-    public function update($id_pengembalian, $tanggal_pengembalian, $denda) {
-        $sql = "UPDATE pengembalian 
-                SET id_peminjaman = ?, tanggal_pengembalian = ?, denda = ?
-                WHERE id_pengembalian = ?";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([$tanggal_pengembalian ?: null, $denda ?: 0, $id_pengembalian]);
-    }
+public function update($id_pengembalian, $id_peminjaman, $tanggal_pengembalian, $denda)
+{
+    // Update tabel pengembalian
+    $sql = "UPDATE pengembalian 
+            SET id_peminjaman = ?, tanggal_pengembalian = ?, denda = ?
+            WHERE id_pengembalian = ?";
+    
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([
+        $id_peminjaman,
+        $tanggal_pengembalian ?: null,
+        $denda ?: 0,
+        $id_pengembalian
+    ]);
+
+    // 🔥 Update tabel peminjaman
+    $sqlUpdatePinjam = "UPDATE peminjaman 
+                        SET tanggal_kembali = ?, status = 'Dikembalikan'
+                        WHERE id_peminjaman = ?";
+    $stmtUpdatePinjam = $this->pdo->prepare($sqlUpdatePinjam);
+    return $stmtUpdatePinjam->execute([
+        $tanggal_pengembalian ?: null,
+        $id_peminjaman
+    ]);
+}
+
+
 
     public function delete($id) {
         $stmt = $this->pdo->prepare("DELETE FROM pengembalian WHERE id_pengembalian = ?");
         return $stmt->execute([$id]);
     }
+
+    public function getPeminjamanById($id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM peminjaman WHERE id_peminjaman = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
 }
