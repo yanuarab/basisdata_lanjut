@@ -67,4 +67,10 @@ class Anggota {
         $stmt = $this->db->prepare("DELETE FROM anggota WHERE id_anggota = :id");
         return $stmt->execute(['id' => $id]);
     }
+
+    // tampilan dashboard
+    public function getTotalAnggota() {
+        return $this->db->query("SELECT COUNT(*) AS total FROM anggota")
+                        ->fetch(PDO::FETCH_ASSOC)['total'];
+    }
 }

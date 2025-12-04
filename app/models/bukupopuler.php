@@ -20,4 +20,10 @@ class BukuPopuler {
         $sql = "REFRESH MATERIALIZED VIEW mv_buku_populer";
         return $this->db->exec($sql);
     }
+
+    // TAMPILAN DASHBOARD
+    public function getBukuPalingPopuler() {
+        $sql = "SELECT * FROM mv_buku_populer ORDER BY total_pinjam DESC LIMIT 1";
+        return $this->db->query($sql)->fetch(PDO::FETCH_ASSOC);
+    }
 }

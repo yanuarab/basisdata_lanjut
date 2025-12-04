@@ -190,6 +190,28 @@ class Buku {
         $stmt->execute([$id_peminjaman]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    // TAMPILAN DASHBOARD
+    public function getTotalBuku() {
+        return $this->pdo->query("SELECT COUNT(*) AS total FROM buku")
+                        ->fetch(PDO::FETCH_ASSOC)['total'];
+    }
+
+    public function getBukuStokMax() {
+        return $this->pdo->query("SELECT * FROM buku ORDER BY stok DESC LIMIT 1")
+                        ->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getBukuStokMin() {
+        return $this->pdo->query("SELECT * FROM buku ORDER BY stok ASC LIMIT 1")
+                        ->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // buku dengan stok menipis (<= 3)
+    public function getBukuMenipis() {
+        $stmt = $this->pdo->query("SELECT * FROM buku WHERE stok <= 3 ORDER BY stok ASC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 
 ?>

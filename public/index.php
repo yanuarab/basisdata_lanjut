@@ -22,7 +22,7 @@ $pdo = $db->getConnection();
 
 /* INISIASI OBJEK */
 $auth          = new AuthController($pdo);
-$dashboard     = new DashboardController();
+$dashboard     = new DashboardController($pdo);
 $buku          = new BukuController($pdo);
 $anggota       = new AnggotaController($pdo);
 $peminjaman    = new PeminjamanController($pdo);

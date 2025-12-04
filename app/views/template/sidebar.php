@@ -213,14 +213,14 @@
 
         <li>
             <a href="<?= BASE_URL ?>peminjaman">
-                <i class="fas fa-handshake"></i>
+                <i class="fas fa-reply"></i>
                 <span>Peminjaman</span>
             </a>
         </li>
 
         <li>
             <a href="<?= BASE_URL ?>pengembalian">
-                <i class="fas fa-handshake"></i>
+                <i class="fas fa-share"></i>
                 <span>Pengembalian</span>
             </a>
         </li>

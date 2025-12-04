@@ -31,21 +31,89 @@ $error = $error ?? null;
             box-shadow: 0px 8px 30px rgba(0,0,0,0.25);
             transition: 0.4s ease;
         }
+
         .card:hover {
-            border: 1px solid #ffeba7;
+            border: 1px solid #92bfba;
             transform: scale(1.03);
             box-shadow: 0px 12px 40px rgba(0,0,0,0.35);
         }
-        .logo-box { display: flex; justify-content: center; margin-bottom: .7rem; margin-top: -10px; }
-        .logo-icon { width: 55px; height: 55px; }
-        .field { margin-top: .5rem; display: flex; align-items: center; gap: .5em; background-color: #1f2029; border-radius: 4px; padding: .5em 1em; position: relative; }
-        .input-icon { height: 1em; width: 1em; fill: #ffeba7; }
-        .input-field { background: none; border: none; outline: none; width: 100%; color: #d3d3d3; }
-        .eye-icon { width: 1.1em; height: 1.1em; fill: #ffeba7; cursor: pointer; position: absolute; right: 12px; }
-        .title { margin-bottom: 1rem; font-size: 1.5em; font-weight: 500; color: #f5f5f5; }
-        .btn { margin: 1rem 0; border: none; border-radius: 4px; font-weight: bold; font-size: .8em; text-transform: uppercase; padding: 0.6em 1.2em; background-color: #ffeba7; color: #5e6681; width: 100%; cursor: pointer; }
-        .btn:hover { background-color: #5e6681; color: #ffeba7; }
-        .error-box { background: #ffcdcd; padding: 12px; border-left: 4px solid red; margin-bottom: 15px; border-radius: 6px; color: #700000; }
+
+        .logo-box { 
+            display: flex; 
+            justify-content: center; 
+            margin-bottom: .7rem; 
+            margin-top: -10px; 
+        }
+
+        .logo-icon { 
+            width: 55px; 
+            height: 55px; 
+        }
+
+        .field { 
+            margin-top: .5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: .5em; 
+            background-color: #1f2029; 
+            border-radius: 4px; 
+            padding: .5em 1em; 
+            position: relative; 
+        }
+
+        .input-icon { 
+            height: 1em; 
+            width: 1em; 
+            fill: #92bfba; 
+        }
+        .input-field { 
+            background: none; 
+            border: none; 
+            outline: none; 
+            width: 100%; 
+            color: #d3d3d3; 
+        }
+        .eye-icon { 
+            width: 1.1em; 
+            height: 1.1em; 
+            fill: #92bfba; 
+            cursor: pointer; 
+            position: absolute; 
+            right: 12px; 
+        }
+        .title { 
+            margin-bottom: 1rem; 
+            font-size: 1.5em; 
+            font-weight: 500; 
+            color: #f5f5f5; 
+        }
+        .btn { 
+            margin: 1rem 0; 
+            border: none; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            font-size: .8em; 
+            text-transform: uppercase; 
+            padding: 0.6em 1.2em; 
+            background-color: #92bfba; 
+            color: #5e6681; 
+            width: 100%; 
+            cursor: pointer; 
+        }
+        .btn:hover { 
+            background-color: #5e6681; 
+            color: #92bfba; 
+        }
+
+        .error-box { 
+            background: #ffcdcd; 
+            padding: 12px; 
+            border-left: 4px solid red; 
+            margin-bottom: 15px; 
+            border-radius: 6px; 
+            color: #700000; 
+        }
+        
     </style>
 </head>
 
@@ -56,7 +124,7 @@ $error = $error ?? null;
 
         <div class="logo-box">
             <svg class="logo-icon" viewBox="0 0 24 24">
-                <path fill="#ffeba7" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                <path fill="#92bfba" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
                 <path fill="#2a2b38" d="M12 21c-4.41-1.08-7-5.41-7-10V6.3l7-3.11 7 3.11V11c0 4.59-2.59 8.92-7 10z"/>
             </svg>
         </div>

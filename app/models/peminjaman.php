@@ -247,4 +247,13 @@ class Peminjaman
         }
     }
 
+    // TAMPILAN DASHBOARD
+    public function getPeminjamanHariIni() {
+        $sql = "SELECT COUNT(*) AS total
+                FROM peminjaman
+                WHERE DATE(tanggal_pinjam) = CURRENT_DATE";
+
+        return $this->pdo->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
+    }
+
 }
